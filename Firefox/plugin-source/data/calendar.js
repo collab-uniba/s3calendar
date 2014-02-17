@@ -3,6 +3,7 @@
     var docentPage = "https://www.studenti.ict.uniba.it/esse3/auth/docente/CalendarioEsami/ElencoAppelliCalEsa"; //teacher URL
     //docentPage = "calendario"; //test var
 	
+	
 	/*************************************************************************************
 	 Action on mouse click: add an event on Google Calendar
 	*************************************************************************************/
@@ -43,7 +44,7 @@
 				tr_table_s[0].getElementsByTagName('th')[0].colSpan = 8;
 				for (var r=0; r<tr_table_s.length; r=r+1){
 					if (tr_table_s[r].getElementsByTagName('th')[0].innerHTML.indexOf("Giorno") != -1) {
-						var rowSpan = tr_table_s[r+2].getElementsByTagName('td')[0].rowSpan 
+						var rowSpan = tr_table_s[r+2].getElementsByTagName('td')[0].rowSpan;
 						tr_table_s[r].innerHTML += "<th width='' class='detail_table' valign='top' rowspan='2' colspan='1'>Calendario</th>";
 						tr_table_s[r+2].innerHTML += "<td width='' id='calendar"+i+"' class='detail_table' valign='center' rowspan='" + rowSpan + "' style='text-align:center;'></td>";
 						createInput(i, r);
@@ -186,8 +187,7 @@
 		var where = info[3].replace(" ","+");
 		//construct Google Calendar URL
 		var indirizzo= "https://www.google.com/calendar/render?action=TEMPLATE&src=" +calendar_name+ "&text=" + text + 
-		"&dates=" + data + "T"+ oraInizio + "00/"+ data + "T" + oraFine +"00&location="+where+"&details="+ 
-		text +"%0A%0A&sf=true&output=xml";
+		"&dates=" + data + "T"+ oraInizio + "00/"+ data + "T" + oraFine +"00&location="+where+"%0A%0A&sf=true&output=xml";
 		//Open new browser window due to confirm event adding.
 		window.open(indirizzo,"blank");
 	};
@@ -214,6 +214,5 @@
 	      return stringCapitalize(orale)+"-";
 	   return empty; 
 	};
-
 
  	main();

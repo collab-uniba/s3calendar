@@ -4,7 +4,7 @@
   "manifest_version": 2,
 
   "options_page": "options.html",
-  "description": "di PV Solution - Copyright 2014 - This addons for Mozilla Firefox and Google Chrome provide a way to export events from Uniba-Esse3 to Google Calendar",
+  "description": "An addon for Mozilla Firefox and Google Chrome, which provides a way to export exams schedule from the Uniba Esse3 system (http://www.studenti.ict.uniba.it/esse3/Home.do) and import it to Google Calendar.",
   "icons": { "256": "calendar.png" },
   
   "permissions": [
