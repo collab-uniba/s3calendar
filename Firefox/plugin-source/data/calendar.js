@@ -126,12 +126,19 @@
 		var type = examType(name_suffix);
 		var name = type+" "+stringCapitalize(name_prefix);
 		//retrieve date and hour and split them
-		var date_hour = infotab[row].getElementsByTagName('td')[2].textContent;
-		var date = date_hour.substring(0,10);
-		var hour = date_hour.substring(11,date_hour.lenght);
-		hour = hour.replace(" ", "");
-		//retrieve location 
-		var place = div_name.getElementsByClassName('tplMessage')[0].textContent;
+		var date_hour = infotab[row].getElementsByTagName('td')[2].textContent; // get "Data ora aula" text
+		//var date = date_hour.substring(0,10);
+		var date = date_hour.slice(0, date_hour.indexOf(" "));
+		var hours = date_hour.substring(date_hour.indexOf(" ")+1); // from time to end, if exist
+		var hour = hours.slice(0, hours.indexOf(" ")); // add start time
+
+		var place = "";
+		place = place.concat(hours.substring(hours.indexOf(" ")));
+		place = place.trim();
+		//var hour = date_hour.substring(11,date_hour.lenght);
+		//hour = hour.replace(" ", "");
+		//retrieve location
+		place = div_name.getElementsByClassName('tplMessage')[0].textContent;
 		info = ["","","",""];
 		//construct output
 		info[0] = stringCapitalize(name);
@@ -176,13 +183,13 @@
 	addToGoogleCalendar = function(info){
 	    //format informations
 		var calendar_name = self.options.calendar;
-		var split_data = info[1].split("/");
-		var split_ora =  info[2].split(":");
-		var data = split_data[2] + split_data[1] + split_data[0];
-		var oraInizio = split_ora[0] + split_ora[1];
-		//duration 3 hour default
-		var oraF = parseInt(split_ora[0]) + 3;
-		var oraFine= oraF + split_ora[1];
+		var split_data = info[1].split("/");	// split date by  char
+		var split_ora =  info[2].split(":");	// split time by : char
+		var data = split_data[2] + split_data[1] + split_data[0];	// data conversion in Google format (yyyymmgg)
+		var oraInizio = split_ora[0] + split_ora[1];	// extract start time
+		//add 3 hour for all exams by default
+		var oraF = parseInt(split_ora[0]) + 3;	// set exam time
+		var oraFine= oraF + split_ora[1];	// add exam time
 		var text = info[0].replace(" ","+");
 		var where = info[3].replace(" ","+");
 		//construct Google Calendar URL
@@ -197,7 +204,7 @@
 	 INPUT: string to parse
 	 OUTPUT: exam type string
 	*************************************************************************************/
-	examType = function(str){
+		examType = function(str){
 	   var scritto = "scritto";
 	   var laboratorio = "laboratorio";
 	   var orale = "orale";

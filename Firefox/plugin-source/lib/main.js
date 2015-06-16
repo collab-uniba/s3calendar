@@ -6,7 +6,9 @@ var pref = require('sdk/simple-prefs');
 
 
 pageMod1.PageMod({
-  include: "*.ict.uniba.it",
+  // include: "*.ict.uniba.it",
+  // include: "http://*/*",
+  include: "file:///C:/Users/Tilly/Downloads/Pagine/*",
   contentScriptFile: data.url("calendar.js"),
   contentScriptOptions: {
     img: data.url("calendar.png"),

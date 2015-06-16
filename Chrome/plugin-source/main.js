@@ -1,3 +1,4 @@
+
 //define student URL - in this way the addons work only on the URLs specified.
     var studentPage = "https://www.studenti.ict.uniba.it/esse3/auth/studente/Appelli/BachecaPrenotazioni"; //student URL
     var docentPage = "https://www.studenti.ict.uniba.it/esse3/auth/docente/CalendarioEsami/ElencoAppelliCalEsa"; //teacher URL
@@ -7,7 +8,8 @@
 	/*************************************************************************************
 	 Action on mouse click: add an event on Google Calendar
 	*************************************************************************************/
-	doAction = function(i, r) {
+	doAction = function(i, r) { // i=numero dell'esame corrispondete della lista degli esami ritrovati
+		console.log(i+" "+r); // r=riga all interno della table dove è presente Giorno
 		addToGoogleCalendar(getInfo(i, r));
 	};
 	
@@ -93,6 +95,7 @@
 	 student and one for teacher.
 	*************************************************************************************/
 	getInfo = function(index, r){
+		console.log(index+" "+r);
 		if (document.URL.indexOf(studentPage) != -1) {
 			return getInfoStudent(index, r);
 		} else if (document.URL.indexOf(docentPage) != -1) {
@@ -126,6 +129,7 @@
 	*************************************************************************************/
 	getInfoDocent = function(index){
 	    //split index in table index and row index
+		console.log("index" +index);
 		var table = index.charAt(0);
 		var row = index.charAt(2);
 		//retrieve all info-table
@@ -144,12 +148,19 @@
 		var type = examType(name_suffix);
 		var name = type+" "+stringCapitalize(name_prefix);
 		//retrieve date and hour and split them
-		var date_hour = infotab[row].getElementsByTagName('td')[2].textContent;
-		var date = date_hour.substring(0,10);
-		var hour = date_hour.substring(11,date_hour.lenght);
-		hour = hour.replace(" ", "");
+		var date_hour = infotab[row].getElementsByTagName('td')[2].textContent; // get "Data ora aula" text
+		//var date = date_hour.substring(0,10);
+		var date = date_hour.slice(0, date_hour.indexOf(" "));
+		var hours = date_hour.substring(date_hour.indexOf(" ")+1); // from time to end, if exist
+		var hour = hours.slice(0, hours.indexOf(" ")); // add start time
+
+		var place = "";
+		place = place.concat(hours.substring(hours.indexOf(" ")));
+		place = place.trim();
+		//var hour = date_hour.substring(11,date_hour.lenght);
+		//hour = hour.replace(" ", "");
 		//retrieve location 
-		var place = div_name.getElementsByClassName('tplMessage')[0].textContent;
+		place = div_name.getElementsByClassName('tplMessage')[0].textContent;
 		info = ["","","",""];
 		//construct output
 		info[0] = stringCapitalize(name);
@@ -184,23 +195,25 @@
 		info[1] = date;
 		info[2] = hour;
 		info[3] = place + " " + aula;
+
+
 		return info;
 	};
-    
-	
+
+
 	/*************************************************************************************
-	 This method add a specified event to Google Calendar 
+	 This method add a specified event to Google Calendar
 	 INPUT: array with event info
 	*************************************************************************************/
 	addToGoogleCalendar = function(info){
 	    //format informations
-		var split_data = info[1].split("/");
-		var split_ora =  info[2].split(":");
-		var data = split_data[2] + split_data[1] + split_data[0];
-		var oraInizio = split_ora[0] + split_ora[1];
-		//duration 3 hour default
-		var oraF = parseInt(split_ora[0]) + 3;
-		var oraFine= oraF + split_ora[1];
+		var split_data = info[1].split("/");	// split date by  char
+		var split_ora =  info[2].split(":");	// split time by : char
+		var data = split_data[2] + split_data[1] + split_data[0];	// data conversion in Google format (yyyymmgg)
+		var oraInizio = split_ora[0] + split_ora[1];	// extract start time
+		//add 3 hour for all exams by default
+		var oraF = parseInt(split_ora[0]) + 3;	// set exam time
+		var oraFine= oraF + split_ora[1];	// add exam time
 		var text = info[0].replace(" ","+");
 		var where = info[3].replace(" ","+");
 		//construct Google Calendar URL
@@ -210,4 +223,3 @@
 	};
 
 	window.addEventListener("load", main(), false);
-	

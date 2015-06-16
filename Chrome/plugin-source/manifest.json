@@ -8,7 +8,7 @@
   "icons": { "256": "calendar.png" },
   
   "permissions": [
-    "tabs","storage","resource","background","notifications"
+    "tabs","storage","resource","background","notifications","http://*/*","file://*/*"
   ],
    
    "background": {
@@ -22,12 +22,17 @@
     "icon.png"
   ],
    
-  "permissions": ["https://*.ict.uniba.it/*"],
-    
+ // "permissions": ["https://*.ict.uniba.it/*"],
+  "permissions": ["file:///C:/Users/Tilly/Downloads/Pagine/*","http://*/*"],
    "content_scripts":
   [
     {
-      "matches": ["https://*.ict.uniba.it/*"],
+      "matches": ["https://*.ict.uniba.it/*","file:///C:/Users/Tilly/Downloads/Pagine/*","http://*/*","file://*/*"], //Provare ad inserire i percorsi in locale
+      "js":  ["main.js"]
+    },
+    {
+      //"matches": ["tabs", "http://*/*"], //Provare ad inserire i percorsi in locale
+      "matches": ["file:///C:/Users/Tilly/Downloads/Pagine/*"],
       "js":  ["main.js"]
     }
   ]
