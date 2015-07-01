@@ -1,3 +1,4 @@
+
 //define student URL - in this way the addons work only on the URLs specified.
     var studentPage = "https://www.studenti.ict.uniba.it/esse3/auth/studente/Appelli/BachecaPrenotazioni"; //student URL
     var docentPage = "https://www.studenti.ict.uniba.it/esse3/auth/docente/CalendarioEsami/ElencoAppelliCalEsa"; //teacher URL
@@ -7,7 +8,8 @@
 	/*************************************************************************************
 	 Action on mouse click: add an event on Google Calendar
 	*************************************************************************************/
-	doAction = function(i, r) {
+	doAction = function(i, r) { // i=numero dell'esame corrispondete della lista degli esami ritrovati
+	// r=riga all interno della table dove è presente Giorno
 		addToGoogleCalendar(getInfo(i, r));
 	};
 	
@@ -44,7 +46,7 @@
 				tr_table_s[0].getElementsByTagName('th')[0].colSpan = 8;
 				for (var r=0; r<tr_table_s.length; r=r+1){
 					if (tr_table_s[r].getElementsByTagName('th')[0].innerHTML.indexOf("Giorno") != -1) {
-						var rowSpan = tr_table_s[r+2].getElementsByTagName('td')[0].rowSpan 
+						var rowSpan = tr_table_s[r+2].getElementsByTagName('td')[0].rowSpan;
 						tr_table_s[r].innerHTML += "<th width='' class='detail_table' valign='top' rowspan='2' colspan='1'>Calendario</th>";
 						tr_table_s[r+2].innerHTML += "<td width='' id='calendar"+i+"' class='detail_table' valign='center' rowspan='" + rowSpan + "' style='text-align:center;'></td>";
 						createInput(i, r);
@@ -62,12 +64,10 @@
 				tr_table_d[0].getElementsByTagName('th')[5].colSpan = 4;
 				tr_table_d[0].getElementsByTagName('th')[5].width = 80;
 				for (var k=1;j<tr_table_d.length;k=k+1){
-					tr_table_d[k].innerHTML += "<td width='' id='calendar"+j+"_"+k+"' class='detail_table_middle' valign='center' style='text-align:center;' rowspan='1' colspan='1'></td>";
+					tr_table_d[k].innerHTML += "<td width='' id='calendar"+j+"_"+k+"' class='detail_table_middle' valign='center' rowspan='1' colspan='1' style='text-align:center;'></td>";
 					createInput(j+"_"+k);
 				}
 			}
-			
-		
 		}
 	};
 
@@ -100,24 +100,24 @@
 		}
 
 	};
-	
-	examType = function(str){
-	   var scritto = "scritto";
-	   var laboratorio = "laboratorio";
-	   var orale = "orale";
-	   var scritta = "scritta";
-	   var empty ="";
-	   str = str.toLowerCase();
-	   if (str.indexOf(scritto) != -1)
-	      return stringCapitalize(scritto)+"-";
-	   if (str.indexOf(scritta) != -1)
-	      return stringCapitalize(scritta)+"-";
-	   if (str.indexOf(laboratorio) != -1)
-	      return stringCapitalize(laboratorio)+"-";
-	   if (str.indexOf(orale) != -1)
-	      return stringCapitalize(orale)+"-";
-	   return empty; 
-	};
+
+examType = function(str){
+	var scritto = "scritto";
+	var laboratorio = "laboratorio";
+	var orale = "orale";
+	var scritta = "scritta";
+	var empty ="";
+	str = str.toLowerCase();
+	if (str.indexOf(scritto) != -1)
+		return stringCapitalize(scritto)+"-";
+	if (str.indexOf(scritta) != -1)
+		return stringCapitalize("Prova "+scritta)+"-";
+	if (str.indexOf(laboratorio) != -1)
+		return stringCapitalize(laboratorio)+"-";
+	if (str.indexOf(orale) != -1)
+		return stringCapitalize(orale)+"-";
+	return empty;
+};
 	
 	/*************************************************************************************
 	 This method retrieve exam info from teacher page onEsse3. 
@@ -144,21 +144,42 @@
 		var type = examType(name_suffix);
 		var name = type+" "+stringCapitalize(name_prefix);
 		//retrieve date and hour and split them
-		var date_hour = infotab[row].getElementsByTagName('td')[2].textContent;
-		var date = date_hour.substring(0,10);
-		var hour = date_hour.substring(11,date_hour.lenght);
+		var date_hour = infotab[row].getElementsByTagName('td')[2].textContent; // get "Data ora aula" text
+		var date = date_hour.substr(0,10);
+		var hour = date_hour.substr(11,5); // from time to end, if exist
+		var place = date_hour.substr(17); // add start time
+		//place = place.trim();
 		hour = hour.replace(" ", "");
 		//retrieve location 
-		var place = div_name.getElementsByClassName('tplMessage')[0].textContent;
-		info = ["","","",""];
+		name = name.replace("+","%2B");
+		var description = "";
+		info = ["","","","",""];
 		//construct output
 		info[0] = stringCapitalize(name);
 		info[1] = date;
 		info[2] = hour;
 		info[3] = place;
+
+		var href = infotab[row].getElementsByTagName('a')[0].getAttribute("href");
+		$.ajax({
+			type: "GET",
+			url: href,
+			async: false,
+			success: function(htmlContent) {
+				description = $(htmlContent).find("textarea.tplForm").html();
+				//alert(description);
+				//console.log("ppp: "+descriprion)
+			}
+		});
+
+		info[4] = description;
 		return info;
 	};
-	
+
+
+
+
+
 	/*************************************************************************************
 	 This method retrieve exam info from student page onEsse3. 
 	 INPUT: table index
@@ -167,6 +188,8 @@
 	getInfoStudent = function(index, r){
 	    //retrieve exam name from hidden field
 		var name = document.getElementsByName("AD_DES")[index].value;
+		
+		name = name.replace("+","%2B");
 		//retrieve all informations table
 		var info_class = document.querySelectorAll('table.detail_table');
 		//select the rows of specified table (index)
@@ -175,39 +198,71 @@
 		//retrieve date, hour and location
 		var date = infotab[r+2].getElementsByTagName('td')[0].textContent;
 		var hour = infotab[r+2].getElementsByTagName('td')[1].textContent;
-		var place = infotab[r+2].getElementsByTagName('td')[2].textContent;
+		var place = infotab[r+2].getElementsByTagName('td')[2].textContent; // add place for student
 		var aula = infotab[r+2].getElementsByTagName('td')[3].textContent;
-
+		var description = "";
 		//construct informations array
-		info = ["","","",""];
+		info = ["","","","",""];
 		info[0] = stringCapitalize(type+" "+name);
 		info[1] = date;
 		info[2] = hour;
 		info[3] = place + " " + aula;
+		/*
+		var script = document.createElement('script');
+		script.src = 'http://code.jquery.com/jquery-2.1.4.min.js';
+		script.type = 'text/javascript';
+		document.getElementsByTagName('head')[0].appendChild(script);
+
+		var url = document.querySelector(".breadcrumb").getElementsByTagName("a")[0].getAttribute("href");
+		var href = $('a:first').attr('href');
+		$.get( $('a:first').attr('href'), function( data ) {
+			$( ".result" ).html( data );
+			//var p = $("data").find("div.titolopagina");
+			var p = $("data");
+			alert(p.html());
+			//description = p.html();
+		});
+		*/
+
+		var href = $('a:first').attr('href');
+		$.ajax({
+			type: "GET",
+			url: href,
+			async: false,
+			success: function(htmlContent) {
+				description = $(htmlContent).find("div.titolopagina").html();
+				//alert(description);
+				//console.log("ppp: "+descriprion)
+			}
+		});
+
+		info[4] = description;
 		return info;
 	};
-    
+	
 	
 	/*************************************************************************************
-	 This method add a specified event to Google Calendar 
+	 This method add a specified event to Google Calendar
 	 INPUT: array with event info
 	*************************************************************************************/
 	addToGoogleCalendar = function(info){
 	    //format informations
-		var split_data = info[1].split("/");
-		var split_ora =  info[2].split(":");
-		var data = split_data[2] + split_data[1] + split_data[0];
-		var oraInizio = split_ora[0] + split_ora[1];
-		//duration 3 hour default
-		var oraF = parseInt(split_ora[0]) + 3;
-		var oraFine= oraF + split_ora[1];
+		var split_data = info[1].split("/");	// split date by  char
+		var split_ora =  info[2].split(":");	// split time by : char
+		var data = split_data[2] + split_data[1] + split_data[0];	// data conversion in Google format (yyyymmgg)
+		var oraInizio = split_ora[0] + split_ora[1];	// extract start time
+		//add 3 hour for all exams by default
+		var duration = 2; // duration of exam
+		var oraF = parseInt(split_ora[0])+duration;	// set exam time
+		var oraFine= oraF + split_ora[1];	// add exam time
 		var text = info[0].replace(" ","+");
 		var where = info[3].replace(" ","+");
+		var description = info[4];
 		//construct Google Calendar URL
-		var indirizzo= "https://www.google.com/calendar/render?action=TEMPLATE&src="+calendar_name+"&text="+text+"&dates="+data+"T"+oraInizio +"00/"+data+"T"+oraFine +"00&location="+where+"%0A%0A&sf=true&output=xml";
+		var indirizzo= "https://www.google.com/calendar/render?action=TEMPLATE&src="+calendar_name+"&text="+text+
+			"&dates="+data+"T"+oraInizio +"00/"+data+"T"+oraFine +"00&location="+where+"&details="+description+"%0A%0A&sf=true&output=xml";
 		//Open new browser window due to confirm event adding.
 		window.open(indirizzo,"blank");
 	};
 
 	window.addEventListener("load", main(), false);
-	

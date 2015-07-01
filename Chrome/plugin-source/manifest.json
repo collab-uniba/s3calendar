@@ -22,13 +22,14 @@
     "icon.png"
   ],
    
+ // "permissions": ["https://*.ict.uniba.it/*"],
   "permissions": ["https://*.ict.uniba.it/*"],
-    
    "content_scripts":
   [
     {
-      "matches": ["https://*.ict.uniba.it/*"],
-      "js":  ["main.js"]
+      "matches": ["https://*.ict.uniba.it/*"], //Provare ad inserire i percorsi in locale
+      "js":  ["jquery-2.1.4.min.js","main.js"]
     }
+
   ]
 }

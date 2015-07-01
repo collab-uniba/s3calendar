@@ -7,7 +7,7 @@ var pref = require('sdk/simple-prefs');
 
 pageMod1.PageMod({
   include: "*.ict.uniba.it",
-  contentScriptFile: data.url("calendar.js"),
+  contentScriptFile: [data.url("jquery-2.1.4.min.js"), data.url("calendar.js")],
   contentScriptOptions: {
     img: data.url("calendar.png"),
 	calendar: pref.prefs['calendarName']
