@@ -11,9 +11,9 @@ Download (ver. 0.1)
 ========
 (right-click to save as)
 
-Google Chrome: https://dl.dropboxusercontent.com/u/420195/s3calendar/S3%20-%20Calendar.crx
+Google Chrome: https://github.com/collab-uniba/s3calendar/blob/master/Chrome/S3-Calendar.crx
 
-Mozilla Firefox: https://dl.dropboxusercontent.com/u/420195/s3calendar/s3calendar.xpi
+Mozilla Firefox: https://github.com/collab-uniba/s3calendar/blob/master/Firefox/S3-Calendar.xpi
 
 Please, not that the Google Chrome extension is not signed, so you need to enable the "Developer mode" in your chrome://extensions page before trying to install it.
 
